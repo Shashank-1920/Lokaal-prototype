@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lokaal | Your Campus Cheat Code</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #030305;
+      --surface: #0f0f13;
+      --surface-glass: rgba(20, 20, 25, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.2);
+      
+      --brand: #E0FF22; /* High energy neon yellow/lime */
+      --brand-glow: rgba(224, 255, 34, 0.4);
+      --accent-1: #FF3366; /* Neon pink/coral */
+      --accent-2: #33E1FF; /* Cyan */
+      --accent-3: #8C33FF; /* Purple */
+      
+      --text-main: #FFFFFF;
+      --text-muted: #8A8A93;
+      
+      --font-head: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      overflow-x: hidden;
+      cursor: default; /* We will use a custom dot, but keep default pointer for safety */
+    }
+
+    /* Noise Background */
+    .noise {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Abstract Ambient Glows */
+    .ambient-glow {
+      position: fixed; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.4;
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+    .glow-yellow { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(224, 255, 34, 0.15); }
+    .glow-purple { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: rgba(140, 51, 255, 0.15); animation-delay: -5s; }
+    .glow-cyan { top: 40%; left: 40%; width: 40vw; height: 40vw; background: rgba(51, 225, 255, 0.1); animation-duration: 25s; }
+
+    @keyframes drift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(10%, 10%) scale(1.1); }
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%;
+      padding: 24px 48px; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(to bottom, rgba(3,3,5,0.9), transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+    .logo {
+      font-family: var(--font-head); font-weight: 800; font-size: 28px;
+      letter-spacing: -1px; color: var(--text-main); display: flex; align-items: center; gap: 8px;
+    }
+    .logo span { color: var(--brand); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 15px;
+      transition: color 0.3s; position: relative;
+    }
+    .nav-links a:hover { color: var(--text-main); }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -6px; left: 0; width: 0%; height: 2px;
+      background: var(--brand); transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Layout: Bento Grid */
+    .container {
+      max-width: 1400px; margin: 120px auto 60px; padding: 0 48px;
+      display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(100px, auto); gap: 24px;
+    }
+
+    /* Base Card Style */
+    .bento-card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 32px; padding: 40px;
+      position: relative; overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s, box-shadow 0.4s;
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hover);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .card-tag {
+      display: inline-block; padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* specific cards */
+    .hero-card { grid-column: span 8; grid-row: span 3; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(circle at top right, rgba(224,255,34,0.05), transparent 60%), var(--surface-glass); }
+    .delivery-card { grid-column: span 4; grid-row: span 3; background: linear-gradient(135deg, rgba(255,51,102,0.1), rgba(20,20,25,0.8)); border-color: rgba(255,51,102,0.2); }
+    .food-card { grid-column: span 6; grid-row: span 2; }
+    .travel-card { grid-column: span 6; grid-row: span 2; background: linear-gradient(to top right, rgba(51,225,255,0.05), rgba(20,20,25,0.8)); }
+
+    /* Hero Typography */
+    .hero-title {
+      font-family: var(--font-head); font-size: clamp(48px, 5vw, 72px); font-weight: 800;
+      line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px;
+    }
+    .hero-title .highlight {
+      color: var(--brand);
+    }
+    .hero-desc {
+      font-size: 20px; color: var(--text-muted); max-width: 80%; line-height: 1.6; font-weight: 400; margin-bottom: 40px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 16px 32px; border-radius: 100px; font-family: var(--font-head); font-weight: 700; font-size: 16px;
+      cursor: pointer; transition: all 0.3s; text-decoration: none; border: none;
+    }
+    .btn-primary { background: var(--brand); color: #000; box-shadow: 0 0 20px rgba(224,255,34,0.2); }
+    .btn-primary:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(224,255,34,0.4); }
+    .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border-hover); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: var(--text-main); }
+
+    /* Delivery Card specific */
+    .delivery-card .card-tag { background: rgba(255,51,102,0.2); color: var(--accent-1); }
+    .delivery-title { font-family: var(--font-head); font-size: 32px; font-weight: 700; margin-bottom: 12px; letter-spacing: -1px; }
+    .delivery-subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 32px; line-height: 1.5; }
+    
+    .comparison-box {
+      background: rgba(0,0,0,0.4); border-radius: 20px; padding: 20px; margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,51,102,0.1);
+    }
+    .comp-item { text-align: center; }
+    .comp-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .comp-val { font-family: var(--font-head); font-size: 24px; font-weight: 700; text-decoration: line-through; color: var(--text-muted); }
+    .comp-val.highlight { color: var(--brand); text-decoration: none; font-size: 32px; text-shadow: 0 0 10px rgba(224,255,34,0.3); }
+    .comp-vs { font-weight: 700; color: rgba(255,255,255,0.2); }
+
+    .shop-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .shop-item { display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+    .shop-item:hover { background: rgba(255,255,255,0.06); border-color: var(--border-hover); transform: translateX(4px); }
+    .shop-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .shop-details h4 { font-size: 15px; font-weight: 600; }
+    .shop-details p { font-size: 13px; color: var(--text-muted); }
+
+    /* Food Card specific */
+    .food-card .card-tag { background: rgba(224,255,34,0.15); color: var(--brand); }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+    .section-head h3 { font-family: var(--font-head); font-size: 40px; font-weight: 700; letter-spacing: -1px; }
+    
+    .food-grid { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; scrollbar-width: none; }
+    .food-grid::-webkit-scrollbar { display: none; }
+    .place-card {
+      min-width: 240px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 20px;
+      overflow: hidden; transition: transform 0.3s, border-color 0.3s;
+    }
+    .place-card:hover { transform: translateY(-4px); border-color: var(--brand); }
+    .place-img { height: 120px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .place-info { padding: 20px; }
+    .place-info h4 { font-family: var(--font-head); font-size: 18px; margin-bottom: 4px; }
+    .place-info p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .place-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--brand); }
+
+    /* Travel Card specific */
+    .travel-card .card-tag { background: rgba(51,225,255,0.15); color: var(--accent-2); }
+    .route-list { display: flex; flex-direction: column; gap: 16px; }
+    .route-item {
+      display: flex; justify-content: space-between; align-items: center; padding: 20px;
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 20px;
+      transition: all 0.3s; cursor: pointer;
+    }
+    .route-item:hover { background: rgba(51,225,255,0.05); border-color: var(--accent-2); padding-left: 24px; }
+    .route-left h4 { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .route-left p { font-size: 14px; color: var(--text-muted); }
+    .route-right { text-align: right; }
+    .route-budget { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--accent-2); }
+    .route-type { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Floating Action */
+    .fab {
+      position: fixed; bottom: 40px; right: 40px; z-index: 100;
+      background: var(--text-main); color: #000;
+      padding: 16px 24px; border-radius: 100px;
+      font-family: var(--font-head); font-weight: 700; font-size: 15px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      cursor: pointer; transition: all 0.3s;
+    }
+    .fab:hover { transform: translateY(-4px) scale(1.05); }
+    .fab-icon { background: var(--brand); width: 12px; height: 12px; border-radius: 50%; animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(224,255,34,0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(224,255,34,0); }
+      100% { box-shadow: 0 0 0 0 rgba(224,255,34,0); }
+    }
+
+    /* Custom Cursor Element */
+    .cursor-dot {
+      width: 8px; height: 8px; background: var(--brand); border-radius: 50%;
+      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
+    }
+    .cursor-follower {
+      width: 40px; height: 40px; border: 1px solid rgba(224,255,34,0.4); border-radius: 50%;
+      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background 0.3s;
+    }
+    body:hover .cursor-dot { opacity: 1; }
+
+    @media (max-width: 1024px) {
+      .container { grid-template-columns: 1fr; padding: 0 24px; margin-top: 100px; }
+      .bento-card { grid-column: 1 / -1 !important; }
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .hero-title { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="noise"></div>
+  <div class="ambient-glow glow-yellow"></div>
+  <div class="ambient-glow glow-purple"></div>
+  <div class="ambient-glow glow-cyan"></div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-follower" id="cursor-follower"></div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">Lo<span>kaal</span></div>
+    <div class="nav-links">
+      <a href="#food">Food & Places</a>
+      <a href="#delivery">Hyperlocal Delivery</a>
+      <a href="#travel">Weekend Escapes</a>
+    </div>
+  </nav>
+
+  <!-- Main Bento Grid -->
+  <main class="container">
+    
+    <!-- Hero / Intro Card -->
+    <div class="bento-card hero-card" data-tilt>
+      <div class="card-tag" style="background: rgba(255,255,255,0.1); color: var(--text-main);">Kanchipuram Pilot</div>
+      <h1 class="hero-title">Your city.<br><span class="highlight">Finally decoded.</span></h1>
+      <p class="hero-desc">Built by students, for students. We solve the discovery friction and the auto-tax. The ultimate cheat code for surviving and thriving in Kanchipuram.</p>
+      <div style="display: flex; gap: 16px;">
+        <a href="#delivery" class="btn btn-primary">Order Delivery</a>
+        <a href="#food" class="btn btn-outline">Explore Campus Spots</a>
+      </div>
+    </div>
+
+    <!-- Delivery Action Card -->
+    <div class="bento-card delivery-card" id="delivery" data-tilt>
+      <div class="card-tag">Hyperlocal Delivery</div>
+      <h2 class="delivery-title">Skip the auto.<br>We'll get it.</h2>
+      <p class="delivery-subtitle">Campus riders bring essentials from Enathur shops straight to your hostel block in ~30 mins.</p>
+      
+      <div class="comparison-box">
+        <div class="comp-item">
+          <div class="comp-label">Auto Fare</div>
+          <div class="comp-val">₹350</div>
+        </div>
+        <div class="comp-vs">VS</div>
+        <div class="comp-item">
+          <div class="comp-label">Lokaal Fee</div>
+          <div class="comp-val highlight">₹45</div>
+        </div>
+      </div>
+
+      <div class="shop-list">
+        <div class="shop-item">
+          <div class="shop-icon">🛒</div>
+          <div class="shop-details">
+            <h4>Raja General Store</h4>
+            <p>Groceries, Snacks, Essentials</p>
+          </div>
+        </div>
+        <div class="shop-item">
+          <div class="shop-icon">📚</div>
+          <div class="shop-details">
+            <h4>Sri Lakshmi Stationery</h4>
+            <p>Books, Printing, Lab Records</p>
+          </div>
+        </div>
+        <div class="shop-item">
+          <div class="shop-icon">💊</div>
+          <div class="shop-details">
+            <h4>Murugan Medical</h4>
+            <p>Medicines & Toiletries</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--accent-1); color: white; box-shadow: 0 0 20px rgba(255,51,102,0.3);">Order via WhatsApp ↗</button>
+    </div>
+
+    <!-- Food & Discovery Card -->
+    <div class="bento-card food-card" id="food">
+      <div class="section-head">
+        <div>
+          <div class="card-tag">Food & Restaurants</div>
+          <h3>Curated Campus Spots</h3>
+        </div>
+        <button class="btn btn-outline" style="padding: 10px 20px; font-size: 14px;">View All 60+</button>
+      </div>
+
+      <div class="food-grid">
+        <!-- Place 1 -->
+        <div class="place-card">
+          <div class="place-img" style="background: linear-gradient(45deg, #1a1a00, #333300);">🍛</div>
+          <div class="place-info">
+            <h4>Annapoorna Mess</h4>
+            <p>📍 250m from main gate</p>
+            <div class="place-meta">
+              <span>★ 4.6</span>
+              <span>₹60–80 / meal</span>
+            </div>
+          </div>
+        </div>
+        <!-- Place 2 -->
+        <div class="place-card">
+          <div class="place-img" style="background: linear-gradient(45deg, #331a00, #4d2600);">🍖</div>
+          <div class="place-info">
+            <h4>Nawab Biryani</h4>
+            <p>📍 Enathur main road</p>
+            <div class="place-meta">
+              <span>★ 4.8</span>
+              <span>₹90–140</span>
+            </div>
+          </div>
+        </div>
+        <!-- Place 3 -->
+        <div class="place-card">
+          <div class="place-img" style="background: linear-gradient(45deg, #001a33, #002b4d);">☕</div>
+          <div class="place-info">
+            <h4>Campus Chai Corner</h4>
+            <p>📍 Inside campus</p>
+            <div class="place-meta">
+              <span>★ 4.3</span>
+              <span>₹15–40</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekend Escapes Card -->
+    <div class="bento-card travel-card" id="travel">
+      <div class="card-tag">Travel Routes</div>
+      <h3 style="font-family: var(--font-head); font-size: 32px; font-weight: 700; margin-bottom: 24px; letter-spacing: -1px;">Student-budget escapes</h3>
+      
+      <div class="route-list">
+        <div class="route-item">
+          <div class="route-left">
+            <h4>Mahabalipuram</h4>
+            <p>1.5 hrs by bus • Heritage & Beach</p>
+          </div>
+          <div class="route-right">
+            <div class="route-budget">₹300–450</div>
+            <div class="route-type">Day Trip</div>
+          </div>
+        </div>
+        <div class="route-item">
+          <div class="route-left">
+            <h4>Pondicherry</h4>
+            <p>2.5 hrs by bus • French Town & Food</p>
+          </div>
+          <div class="route-right">
+            <div class="route-budget">₹450–600</div>
+            <div class="route-type">Overnight</div>
+          </div>
+        </div>
+        <div class="route-item">
+          <div class="route-left">
+            <h4>Chennai City</h4>
+            <p>1.5 hrs by train • Shopping & Nightlife</p>
+          </div>
+          <div class="route-right">
+            <div class="route-budget">₹200–350</div>
+            <div class="route-type">Day Trip</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="fab">
+    <div class="fab-icon"></div>
+    Delivery Live
+  </div>
+
+  <script>
+    // Custom Cursor Logic
+    const dot = document.getElementById('cursor-dot');
+    const follower = document.getElementById('cursor-follower');
+    let mouseX = 0, mouseY = 0;
+    let dotX = 0, dotY = 0;
+    let folX = 0, folY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animateCursor() {
+      // Fast follow for dot
+      dotX += (mouseX - dotX) * 0.5;
+      dotY += (mouseY - dotY) * 0.5;
+      dot.style.left = dotX + 'px';
+      dot.style.top = dotY + 'px';
+
+      // Smooth delay for follower
+      folX += (mouseX - folX) * 0.15;
+      folY += (mouseY - folY) * 0.15;
+      follower.style.left = folX + 'px';
+      follower.style.top = folY + 'px';
+
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Hover effect on interactive elements
+    const interactables = document.querySelectorAll('a, button, .shop-item, .place-card, .route-item, .fab');
+    interactables.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        follower.style.width = '60px';
+        follower.style.height = '60px';
+        follower.style.background = 'rgba(224,255,34,0.1)';
+        dot.style.transform = 'translate(-50%, -50%) scale(0.5)';
+      });
+      el.addEventListener('mouseleave', () => {
+        follower.style.width = '40px';
+        follower.style.height = '40px';
+        follower.style.background = 'transparent';
+        dot.style.transform = 'translate(-50%, -50%) scale(1)';
+      });
+    });
+
+    // 3D Tilt Effect for specific cards
+    const tiltCards = document.querySelectorAll('[data-tilt]');
+    tiltCards.forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -4; // Max 4 deg
+        const rotateY = ((x - centerX) / centerX) * 4;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        card.style.transition = 'none';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+        card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s, box-shadow 0.4s';
+      });
+    });
+  </script>
+</body>
+</html>
